@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import Particles from 'react-particles-js'
-import Clarifai from 'clarifai';
 import Navigation from './components/Navigation/Navigation'
 import Logo from './components/Logo/Logo'
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'
@@ -23,32 +22,22 @@ const PARTICLES_PARAM = {
   }
 }
 
-const app = new Clarifai.App({
-  apiKey: 'aceecbb72eaf453faeb5d4112e960d8c'
-});
-
- 
-class App extends Component {
-  state = {
-    input: 'https://samples.clarifai.com/face-det.jpg',
-    imageUrl: '',
-    box: {},
-    route: 'signin',
-    isSignedIn: false,
-    user: {
-      id: '',
-      name: '',
-      email: '',
-      entries: 0,
-      joined: ''
-    }
+const initialState = {
+  input: 'https://samples.clarifai.com/face-det.jpg',
+  imageUrl: '',
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
   }
-
-  // componentDidMount() {
-  //   fetch('http://localhost:3485/')
-  //     .then(res => res.json())
-  //     .then(console.log)
-  // }
+}
+class App extends Component {
+  state = initialState
 
   calcFaceLocation = data => {
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box
@@ -75,30 +64,36 @@ class App extends Component {
   onButtonSubmit = (e) => {
     this.setState({imageUrl: this.state.input})
 
-    app.models.predict(
-        Clarifai.FACE_DETECT_MODEL, 
-        this.state.input)
-      .then(res => {
-        if(res)
-          fetch('http://localhost:3485/image', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                id: this.state.user.id
-            })
-          })
-          .then(res => res.json())
-          .then(entries => {
-            this.setState(Object.assign(this.state.user, {entries}))
-          })
-        this.displayFaceBox(this.calcFaceLocation(res))
+    fetch('http://localhost:3485/api/imageUrl', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+          input: this.state.input
       })
-      .catch(console.log)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if(res)
+        fetch('http://localhost:3485/api/image', {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+              id: this.state.user.id
+          })
+        })
+        .then(res => res.json())
+        .then(entries => {
+          this.setState(Object.assign(this.state.user, {entries}))
+        })
+        .catch(console.log)
+      this.displayFaceBox(this.calcFaceLocation(res))
+    })
+    .catch(console.log)
   }
 
   onRouteChange = (route) => {
     if(route === 'signout'){
-      this.setState({isSignedIn: false})
+      this.setState(initialState)
     }else if(route === 'home'){
       this.setState({isSignedIn: true})
     }
@@ -144,15 +139,3 @@ class App extends Component {
 }
 
 export default App;
-
-// app.models
-// .predict(
-// Clarifai.COLOR_MODEL,
-//     // URL
-//     "https://samples.clarifai.com/metro-north.jpg"
-// )
-// .then(function(response) {
-//     // do something with responseconsole.log(response);
-//     },
-//     function(err) {// there was an error}
-// );

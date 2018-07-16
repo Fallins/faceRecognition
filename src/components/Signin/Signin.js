@@ -19,7 +19,7 @@ class Signin extends Component{
         const {onRouteChange, loadUser} = this.props
         const {email, password} = this.state
 
-        fetch('http://localhost:3485/signin', {
+        fetch('http://localhost:3485/api/signin', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

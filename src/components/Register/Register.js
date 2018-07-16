@@ -24,7 +24,7 @@ class Register extends Component {
         const {onRouteChange, loadUser} = this.props
         const {email, password, name} = this.state
 
-        fetch('http://localhost:3485/register', {
+        fetch('http://localhost:3485/api/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -34,7 +34,7 @@ class Register extends Component {
         .then(res => res.json())
         .then(user => {
             console.log(user)
-            if(user){
+            if(user.id){
                 loadUser(user)
                 onRouteChange('home')
             }

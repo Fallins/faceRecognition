@@ -23,9 +23,9 @@ const PARTICLES_PARAM = {
 }
 
 const initialState = {
-  input: 'https://samples.clarifai.com/face-det.jpg',
+  input: '',
   imageUrl: '',
-  box: {},
+  boxes: [],
   route: 'signin',
   isSignedIn: false,
   user: {
@@ -40,20 +40,32 @@ class App extends Component {
   state = initialState
 
   calcFaceLocation = data => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box
+    let clarifaiFaces = []
     const image = document.getElementById('inputImage')
     const width = Number(image.width)
     const height = Number(image.height)
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col  * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
+
+    if(data) {
+      data.outputs[0].data.regions.forEach(region => {
+        const boundingBox = region.region_info.bounding_box
+        clarifaiFaces.push({
+          leftCol: boundingBox.left_col * width,
+          topRow: boundingBox.top_row * height,
+          rightCol: width - (boundingBox.right_col  * width),
+          bottomRow: height - (boundingBox.bottom_row * height)
+        })
+      })
+      //data.outputs[0].data.regions[0].region_info.bounding_box
     }
+
+     
+    console.log(clarifaiFaces)
+    return clarifaiFaces
   }
 
-  displayFaceBox = box => {
-    this.setState({box})
+  displayFaceBox = boxes => {
+    console.log({boxes})
+    this.setState({boxes})
   }
 
   onInputchange = (e) => {
@@ -61,7 +73,7 @@ class App extends Component {
     this.setState({input: e.target.value})
   }
 
-  onButtonSubmit = (e) => {
+  onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input})
 
     fetch('http://localhost:3485/api/imageUrl', {
@@ -107,8 +119,21 @@ class App extends Component {
     })
   }
 
+  randomImgForDEV = () => {
+    const imgs = [
+      "https://d2eib6r9tuf5y8.cloudfront.net/l/assets/img/article/article-1833-aylollyd/keyvisual.jpg",
+      "https://cdn.cnn.com/cnnnext/dam/assets/180209142705-20180129-trump-admin-departures-split-a-super-tease.jpg",
+      "https://samples.clarifai.com/face-det.jpg"
+    ]
+
+    const rImg = imgs[Math.floor(Math.random() * imgs.length)]
+    this.setState({input: rImg})
+    this.onButtonSubmit()
+    
+  }
+
   render() {
-    const { isSignedIn, imageUrl, route, box, user } = this.state
+    const { isSignedIn, imageUrl, route, boxes, user } = this.state
     return (
       <div className="App">
         <Particles params={PARTICLES_PARAM} className="particles"/>
@@ -117,14 +142,14 @@ class App extends Component {
           route === 'home' ? 
           (
             <div>
-              <Logo />
+              <Logo devClick={this.randomImgForDEV}/>
               <Rank name={user.name} entries={user.entries}/>
               <ImageLinkForm 
                 onInputChange={this.onInputchange} 
                 onButtonSubmit={this.onButtonSubmit}/> 
               <FaceRecognition 
                 imageUrl={imageUrl}
-                box={box}/>
+                boxes={boxes}/>
             </div>
           ) : (
             route === 'signin' ? 

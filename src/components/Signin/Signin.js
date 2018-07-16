@@ -1,11 +1,11 @@
 import React, {Component} from 'react'
 import './Signin.css'
 
-class Signin extends Component{
+class Signin extends Component{    
     state = {
         email: '',
         password: ''
-    }
+    }    
 
     onEmailChange = e => {
         this.setState({email: e.target.value})
@@ -18,7 +18,7 @@ class Signin extends Component{
     onSubmit = () => {
         const {onRouteChange, loadUser} = this.props
         const {email, password} = this.state
-
+        this.devLogin()
         fetch('http://localhost:3485/api/signin', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
@@ -34,6 +34,10 @@ class Signin extends Component{
                 onRouteChange('home');
             }
         })
+    }
+
+    devLogin = () => {
+        this.setState({email: 'user03@test.com', password: 'user03'})
     }
 
     render() {
@@ -61,7 +65,11 @@ class Signin extends Component{
                                     type="password" 
                                     name="password" 
                                     id="password" 
-                                    onChange={this.onPasswordChange}/>
+                                    onChange={this.onPasswordChange}
+                                    onKeyPress={e => {
+                                        if(e.which === 13)
+                                            this.onSubmit()
+                                    }}/>
                             </div>                    
                         </fieldset>
                         <div className="">

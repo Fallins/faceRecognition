@@ -19,7 +19,7 @@ class Signin extends Component{
         const {onRouteChange, loadUser} = this.props
         const {email, password} = this.state
         this.devLogin()
-        fetch('http://localhost:3485/api/signin', {
+        fetch('https://amazing-face-detection-api.herokuapp.com/api/signin', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

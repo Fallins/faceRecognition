@@ -24,7 +24,7 @@ class Register extends Component {
         const {onRouteChange, loadUser} = this.props
         const {email, password, name} = this.state
 
-        fetch('http://localhost:3485/api/register', {
+        fetch('https://amazing-face-detection-api.herokuapp.com/api/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

@@ -1,4 +1,7 @@
-# Amazing Face Recognition
+# The pracetice project for udemy course
+**Amazing Face Recognition**
+
+[Course: The Complete Web Developer in 2018: Zero to Mastery](https://www.udemy.com/the-complete-web-developer-in-2018/learn/v4/content)
 
 ## UI
 ### Framework
